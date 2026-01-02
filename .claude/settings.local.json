@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw generate-sources)",
+      "Bash(cat:*)",
+      "Bash(target/jextract-download/jextract-25/bin/jextract.bat:*)",
+      "Bash(dir \"C:\\Users\\jeanb\\work\\sqlite-ffm\\target\\generated-sources\\jextract\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: SQLite FFM bindings project\n\nSet up Java project using FFM API to call SQLite native library:\n- Auto-download jextract tool and generate Java bindings from sqlite3.h\n- Auto-download SQLite native library from sqlite.org\n- Example Main.java demonstrating basic SQLite operations\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "WebFetch(domain:sqlite.org)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

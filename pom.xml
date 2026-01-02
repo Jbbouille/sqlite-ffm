@@ -15,7 +15,24 @@
     <sqlite.version>3510100</sqlite.version>
     <sqlite.year>2025</sqlite.year>
     <jextract.build>2</jextract.build>
+    <zig.optimize>Debug</zig.optimize>
+    <zig.allTargets>false</zig.allTargets>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.27.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -119,19 +136,23 @@
               <goal>java</goal>
             </goals>
             <configuration>
-              <mainClass>top.petit.build.SqliteNativeDownloader</mainClass>
+              <mainClass>top.petit.build.SqliteNativeCompiler</mainClass>
               <systemProperties>
                 <systemProperty>
                   <key>sqlite.version</key>
                   <value>${sqlite.version}</value>
                 </systemProperty>
                 <systemProperty>
-                  <key>sqlite.year</key>
-                  <value>${sqlite.year}</value>
-                </systemProperty>
-                <systemProperty>
                   <key>sqlite.downloadDir</key>
                   <value>${project.build.directory}/sqlite-native</value>
+                </systemProperty>
+                <systemProperty>
+                  <key>zig.optimize</key>
+                  <value>${zig.optimize}</value>
+                </systemProperty>
+                <systemProperty>
+                  <key>zig.allTargets</key>
+                  <value>${zig.allTargets}</value>
                 </systemProperty>
               </systemProperties>
             </configuration>
@@ -159,7 +180,48 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Surefire plugin for running tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+
+      <!-- Copy native libraries to JAR resources -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-native-libs</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/native</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/sqlite-native</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <properties>
+        <zig.optimize>ReleaseFast</zig.optimize>
+        <zig.allTargets>true</zig.allTargets>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
