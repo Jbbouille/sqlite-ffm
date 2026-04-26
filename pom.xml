@@ -12,8 +12,8 @@
     <maven.compiler.source>25</maven.compiler.source>
     <maven.compiler.target>25</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <sqlite.version>3510100</sqlite.version>
-    <sqlite.year>2025</sqlite.year>
+    <sqlite.version>3530000</sqlite.version>
+    <sqlite.year>2026</sqlite.year>
     <jextract.build>2</jextract.build>
     <zig.optimize>Debug</zig.optimize>
     <zig.allTargets>false</zig.allTargets>
@@ -36,27 +36,6 @@
 
   <build>
     <plugins>
-      <!-- Download SQLite amalgamation sources -->
-      <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-        <version>1.9.0</version>
-        <executions>
-          <execution>
-            <id>download-sqlite</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>wget</goal>
-            </goals>
-            <configuration>
-              <url>https://sqlite.org/${sqlite.year}/sqlite-amalgamation-${sqlite.version}.zip</url>
-              <outputDirectory>${project.build.directory}/sqlite-download</outputDirectory>
-              <unpack>true</unpack>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Compile build tools first (only the build package) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -91,7 +70,7 @@
               <goal>java</goal>
             </goals>
             <configuration>
-              <mainClass>top.petit.build.JextractDownloader</mainClass>
+              <mainClass>top.petit.build.BuildDownloader</mainClass>
               <systemProperties>
                 <systemProperty>
                   <key>jextract.version</key>
@@ -104,6 +83,18 @@
                 <systemProperty>
                   <key>jextract.downloadDir</key>
                   <value>${project.build.directory}/jextract-download</value>
+                </systemProperty>
+                <systemProperty>
+                  <key>sqlite.version</key>
+                  <value>${sqlite.version}</value>
+                </systemProperty>
+                <systemProperty>
+                  <key>sqlite.year</key>
+                  <value>${sqlite.year}</value>
+                </systemProperty>
+                <systemProperty>
+                  <key>sqlite.downloadDir</key>
+                  <value>${project.build.directory}/sqlite-download</value>
                 </systemProperty>
               </systemProperties>
             </configuration>
