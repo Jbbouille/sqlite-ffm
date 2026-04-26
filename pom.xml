@@ -34,6 +34,13 @@
     </dependency>
   </dependencies>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/${github.repository}</url>
+    </repository>
+  </distributionManagement>
+
   <build>
     <plugins>
       <!-- Compile build tools first (only the build package) -->
