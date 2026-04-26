@@ -1,4 +1,4 @@
-# SQLite C API - Implementation Status
+﻿# SQLite C API - Implementation Status
 
 This document lists all SQLite C API functions and their implementation status in this Java wrapper.
 
@@ -14,13 +14,13 @@ This document lists all SQLite C API functions and their implementation status i
 
 ## Connection Management
 
-| Function | Status | Java Method                          |
-|----------|--------|--------------------------------------|
-| sqlite3_open | ✅ | `Sqlite.open(String)`                |
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_open | ✅ | `Sqlite.open(String)` |
 | sqlite3_open_v2 | ✅ | `Sqlite.openV2(String, OpenFlag...)` |
-| sqlite3_open16 | 🚫 | UTF-16 variant                       |
-| sqlite3_close | ✅ | `Sqlite.closeV1()`                   |
-| sqlite3_close_v2 | ✅ | `Sqlite.closeV2()`                   |
+| sqlite3_open16 | 🚫 | UTF-16 variant |
+| sqlite3_close | ✅ | `Sqlite.closeV1()` |
+| sqlite3_close_v2 | ✅ | `Sqlite.closeV2()` |
 
 ## Prepared Statements
 
@@ -90,6 +90,8 @@ This document lists all SQLite C API functions and their implementation status i
 | Function | Status | Java Method |
 |----------|--------|-------------|
 | sqlite3_exec | ✅ | `exec(String)`, `exec(String, ExecCallback)` |
+| sqlite3_get_table | ❌ | - |
+| sqlite3_free_table | ❌ | - |
 
 ## Error Handling
 
@@ -101,6 +103,7 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_errmsg16 | 🚫 | UTF-16 variant |
 | sqlite3_errstr | ❌ | - |
 | sqlite3_error_offset | ❌ | - |
+| sqlite3_system_errno | ❌ | - |
 
 ## Statement Introspection
 
@@ -114,6 +117,9 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_stmt_isexplain | ❌ | - |
 | sqlite3_stmt_explain | ❌ | - |
 | sqlite3_stmt_status | ❌ | - |
+| sqlite3_stmt_scanstatus | ❌ | - |
+| sqlite3_stmt_scanstatus_v2 | ❌ | - |
+| sqlite3_stmt_scanstatus_reset | ❌ | - |
 
 ## Changes & Row IDs
 
@@ -135,6 +141,7 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_get_autocommit | ✅ | `getAutocommit()` |
 | sqlite3_interrupt | ✅ | `interrupt()` |
 | sqlite3_is_interrupted | ✅ | `isInterrupted()` |
+| sqlite3_setlk_timeout | ❌ | - |
 | sqlite3_db_readonly | ❌ | - |
 | sqlite3_db_filename | ❌ | - |
 | sqlite3_db_name | ❌ | - |
@@ -157,6 +164,13 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_sourceid | ✅ | `Sqlite.sourceid()` |
 | sqlite3_version | ❌ | - |
 
+## Compile Options
+
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_compileoption_get | ❌ | - |
+| sqlite3_compileoption_used | ❌ | - |
+
 ## Utilities
 
 | Function | Status | Java Method |
@@ -166,6 +180,16 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_threadsafe | ✅ | `Sqlite.threadsafe()` |
 | sqlite3_sleep | ❌ | - |
 | sqlite3_randomness | ❌ | - |
+| sqlite3_enable_shared_cache | ❌ | - |
+| sqlite3_mprintf | ❌ | - |
+| sqlite3_snprintf | ❌ | - |
+| sqlite3_vmprintf | ❌ | - |
+| sqlite3_vsnprintf | ❌ | - |
+| sqlite3_strglob | ❌ | - |
+| sqlite3_strlike | ❌ | - |
+| sqlite3_stricmp | ❌ | - |
+| sqlite3_strnicmp | ❌ | - |
+| sqlite3_log | ❌ | - |
 
 ## Blob I/O
 
@@ -188,6 +212,16 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_backup_remaining | ✅ | `backupRemaining(Backup)` |
 | sqlite3_backup_pagecount | ✅ | `backupPagecount(Backup)` |
 
+## Snapshot API
+
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_snapshot_get | ❌ | - |
+| sqlite3_snapshot_open | ❌ | - |
+| sqlite3_snapshot_recover | ❌ | - |
+| sqlite3_snapshot_cmp | ❌ | - |
+| sqlite3_snapshot_free | ❌ | - |
+
 ## Hooks & Callbacks
 
 | Function | Status | Java Method |
@@ -201,6 +235,7 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_preupdate_count | ❌ | - |
 | sqlite3_preupdate_depth | ❌ | - |
 | sqlite3_preupdate_blobwrite | ❌ | - |
+| sqlite3_autovacuum_pages | ❌ | - |
 | sqlite3_progress_handler | ❌ | - |
 | sqlite3_trace | ❌ | Deprecated |
 | sqlite3_trace_v2 | ❌ | - |
@@ -224,8 +259,42 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_context_db_handle | ❌ | - |
 | sqlite3_get_auxdata | ❌ | - |
 | sqlite3_set_auxdata | ❌ | - |
-| sqlite3_result_* | ❌ | Multiple functions |
-| sqlite3_value_* | ❌ | Multiple functions |
+| sqlite3_result_blob | ❌ | - |
+| sqlite3_result_blob64 | ❌ | - |
+| sqlite3_result_double | ❌ | - |
+| sqlite3_result_error | ❌ | - |
+| sqlite3_result_error_toobig | ❌ | - |
+| sqlite3_result_error_nomem | ❌ | - |
+| sqlite3_result_error_code | ❌ | - |
+| sqlite3_result_int | ❌ | - |
+| sqlite3_result_int64 | ❌ | - |
+| sqlite3_result_null | ❌ | - |
+| sqlite3_result_text | ❌ | - |
+| sqlite3_result_text64 | ❌ | - |
+| sqlite3_result_text16 | 🚫 | UTF-16 variant |
+| sqlite3_result_text16le | 🚫 | UTF-16 variant |
+| sqlite3_result_text16be | 🚫 | UTF-16 variant |
+| sqlite3_result_value | ❌ | - |
+| sqlite3_result_pointer | ❌ | - |
+| sqlite3_result_zeroblob | ❌ | - |
+| sqlite3_result_zeroblob64 | ❌ | - |
+| sqlite3_result_subtype | ❌ | - |
+| sqlite3_value_blob | ❌ | - |
+| sqlite3_value_bytes | ❌ | - |
+| sqlite3_value_double | ❌ | - |
+| sqlite3_value_int | ❌ | - |
+| sqlite3_value_int64 | ❌ | - |
+| sqlite3_value_pointer | ❌ | - |
+| sqlite3_value_text | ❌ | - |
+| sqlite3_value_text16 | 🚫 | UTF-16 variant |
+| sqlite3_value_type | ❌ | - |
+| sqlite3_value_numeric_type | ❌ | - |
+| sqlite3_value_nochange | ❌ | - |
+| sqlite3_value_frombind | ❌ | - |
+| sqlite3_value_dup | ❌ | - |
+| sqlite3_value_free | ❌ | - |
+| sqlite3_value_subtype | ❌ | - |
+| sqlite3_value_encoding | ❌ | - |
 
 ## Collation
 
@@ -246,7 +315,15 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_declare_vtab | ❌ | - |
 | sqlite3_drop_modules | ❌ | - |
 | sqlite3_overload_function | ❌ | - |
-| sqlite3_vtab_* | ❌ | Multiple functions |
+| sqlite3_vtab_config | ❌ | - |
+| sqlite3_vtab_on_conflict | ❌ | - |
+| sqlite3_vtab_collation | ❌ | - |
+| sqlite3_vtab_nochange | ❌ | - |
+| sqlite3_vtab_distinct | ❌ | - |
+| sqlite3_vtab_in | ❌ | - |
+| sqlite3_vtab_in_first | ❌ | - |
+| sqlite3_vtab_in_next | ❌ | - |
+| sqlite3_vtab_rhs_value | ❌ | - |
 
 ## Authorization
 
@@ -263,6 +340,8 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_auto_extension | ❌ | - |
 | sqlite3_cancel_auto_extension | ❌ | - |
 | sqlite3_reset_auto_extension | ❌ | - |
+| sqlite3_carray_bind | ❌ | carray extension |
+| sqlite3_carray_bind_v2 | ❌ | carray extension — added in 3.50.0 |
 
 ## Serialize/Deserialize
 
@@ -270,6 +349,61 @@ This document lists all SQLite C API functions and their implementation status i
 |----------|--------|-------------|
 | sqlite3_serialize | ❌ | - |
 | sqlite3_deserialize | ❌ | - |
+
+## URI & Filename
+
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_uri_parameter | ❌ | - |
+| sqlite3_uri_boolean | ❌ | - |
+| sqlite3_uri_int64 | ❌ | - |
+| sqlite3_uri_key | ❌ | - |
+| sqlite3_filename_database | ❌ | - |
+| sqlite3_filename_journal | ❌ | - |
+| sqlite3_filename_wal | ❌ | - |
+| sqlite3_create_filename | ❌ | - |
+| sqlite3_free_filename | ❌ | - |
+| sqlite3_database_file_object | ❌ | - |
+
+## Dynamic String (sqlite3_str)
+
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_str_new | ❌ | - |
+| sqlite3_str_finish | ❌ | - |
+| sqlite3_str_appendf | ❌ | - |
+| sqlite3_str_vappendf | ❌ | - |
+| sqlite3_str_append | ❌ | - |
+| sqlite3_str_appendall | ❌ | - |
+| sqlite3_str_appendchar | ❌ | - |
+| sqlite3_str_reset | ❌ | - |
+| sqlite3_str_errcode | ❌ | - |
+| sqlite3_str_length | ❌ | - |
+| sqlite3_str_value | ❌ | - |
+| sqlite3_str_truncate | ❌ | - |
+| sqlite3_str_free | ❌ | - |
+
+## VFS
+
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_vfs_find | ❌ | - |
+| sqlite3_vfs_register | ❌ | - |
+| sqlite3_vfs_unregister | ❌ | - |
+| sqlite3_os_init | ❌ | - |
+| sqlite3_os_end | ❌ | - |
+
+## Mutex
+
+| Function | Status | Java Method |
+|----------|--------|-------------|
+| sqlite3_mutex_alloc | ❌ | - |
+| sqlite3_mutex_free | ❌ | - |
+| sqlite3_mutex_enter | ❌ | - |
+| sqlite3_mutex_try | ❌ | - |
+| sqlite3_mutex_leave | ❌ | - |
+| sqlite3_mutex_held | ❌ | - |
+| sqlite3_mutex_notheld | ❌ | - |
 
 ## Memory Management
 
@@ -307,13 +441,8 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_keyword_count | ❌ | - |
 | sqlite3_keyword_name | ❌ | - |
 | sqlite3_keyword_check | ❌ | - |
-| sqlite3_strglob | ❌ | - |
-| sqlite3_strlike | ❌ | - |
-| sqlite3_stricmp | ❌ | - |
-| sqlite3_strnicmp | ❌ | - |
 | sqlite3_file_control | ❌ | - |
 | sqlite3_unlock_notify | ❌ | - |
-| sqlite3_log | ❌ | - |
 | sqlite3_get_clientdata | ❌ | - |
 | sqlite3_set_clientdata | ❌ | - |
 
@@ -331,9 +460,13 @@ This document lists all SQLite C API functions and their implementation status i
 - `sqlite3_trace_v2` - Query tracing/profiling
 - `sqlite3_create_function_v2` - User-defined functions
 - `sqlite3_expanded_sql` - SQL with bound values
+- `sqlite3_setlk_timeout` - Lock wait timeout (added in 3.45.0)
+- `sqlite3_snapshot_*` - Snapshot isolation
 
 ### Lower Priority
 - Virtual tables
 - Collation
 - Authorization
 - Serialize/Deserialize
+- Dynamic String API (`sqlite3_str_*`)
+- VFS / Mutex
