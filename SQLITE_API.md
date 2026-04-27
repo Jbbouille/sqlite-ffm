@@ -8,7 +8,7 @@ This document lists all SQLite C API functions and their implementation status i
 
 ## Summary
 
-**Implemented: 66 functions**
+**Implemented: 67 functions**
 
 ---
 
@@ -48,7 +48,7 @@ This document lists all SQLite C API functions and their implementation status i
 | sqlite3_bind_null | ✅ | `bindNull(PrepareStatement, int)` |
 | sqlite3_bind_text | ✅ | `bindText(PrepareStatement, int, String)` |
 | sqlite3_bind_text16 | 🚫 | UTF-16 variant |
-| sqlite3_bind_text64 | ❌ | - |
+| sqlite3_bind_text64 | ✅ | `bindText64(PrepareStatement, int, String)` |
 | sqlite3_bind_value | ❌ | - |
 | sqlite3_bind_pointer | ❌ | - |
 | sqlite3_bind_zeroblob | ❌ | - |

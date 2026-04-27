@@ -513,6 +513,27 @@ public class Sqlite implements AutoCloseable {
     }
 
     /**
+     * Binds a text value to a prepared statement parameter, using a 64-bit size.
+     *
+     * <p>Identical to {@link #bindText(PrepareStatement, int, String)} but passes the size as a
+     * {@code long}, allowing strings larger than 2 GiB.</p>
+     *
+     * @param stmt the prepared statement
+     * @param index the parameter index (1-based)
+     * @param value the text value to bind
+     * @throws SqliteExceptionBind if the bind operation fails
+     * @see <a href="https://sqlite.org/c3ref/bind_blob.html">sqlite3_bind documentation</a>
+     */
+    public void bindText64(PrepareStatement stmt, int index, String value) throws SqliteExceptionBind {
+        var textSegment = arena.allocateFrom(value);
+        var rc = sqlite3_bind_text64(stmt.value(), index, textSegment, textSegment.byteSize() - 1, MemorySegment.NULL, (byte) SQLITE_UTF8());
+        var result = Bind.fromCode(rc);
+        if (!result.isOk()) {
+            throw new SqliteExceptionBind("Failed to bind text64 at index %d with error %s.".formatted(index, result), result);
+        }
+    }
+
+    /**
      * Binds a blob value to a prepared statement parameter.
      *
      * @param stmt the prepared statement

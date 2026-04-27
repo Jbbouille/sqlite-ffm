@@ -231,6 +231,23 @@ class SqliteTest {
   }
 
   @Test
+  void bindText64_withValidIndex_succeeds() throws Exception {
+    try (var db = Sqlite.open(":memory:")) {
+      db.exec("CREATE TABLE test (value TEXT)");
+
+      try (var insert = db.prepareV2("INSERT INTO test (value) VALUES (?)")) {
+        db.bindText64(insert, 1, "Hello, World!");
+        db.step(insert);
+      }
+
+      try (var select = db.prepareV2("SELECT value FROM test")) {
+        assertThat(db.step(select)).isEqualTo(Step.ROW);
+        assertThat(db.columnText(select, 0)).isEqualTo("Hello, World!");
+      }
+    }
+  }
+
+  @Test
   void bindBlob_withValidIndex_succeeds() throws Exception {
     try (var db = Sqlite.open(":memory:")) {
       db.exec("CREATE TABLE test (value BLOB)");
