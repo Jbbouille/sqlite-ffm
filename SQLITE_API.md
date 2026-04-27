@@ -214,13 +214,15 @@ This document lists all SQLite C API functions and their implementation status i
 
 ## Snapshot API
 
-| Function | Status | Java Method |
-|----------|--------|-------------|
-| sqlite3_snapshot_get | ❌ | - |
-| sqlite3_snapshot_open | ❌ | - |
-| sqlite3_snapshot_recover | ❌ | - |
-| sqlite3_snapshot_cmp | ❌ | - |
-| sqlite3_snapshot_free | ❌ | - |
+Requires `SQLITE_ENABLE_SNAPSHOT` compile flag (enabled).
+
+| Function | Status | Java Method | Notes |
+|----------|--------|-------------|-------|
+| sqlite3_snapshot_get | ❌ | - | constructor |
+| sqlite3_snapshot_open | ❌ | - | |
+| sqlite3_snapshot_recover | ❌ | - | |
+| sqlite3_snapshot_cmp | ❌ | - | |
+| sqlite3_snapshot_free | ❌ | - | destructor |
 
 ## Hooks & Callbacks
 
@@ -461,7 +463,7 @@ This document lists all SQLite C API functions and their implementation status i
 - `sqlite3_create_function_v2` - User-defined functions
 - `sqlite3_expanded_sql` - SQL with bound values
 - `sqlite3_setlk_timeout` - Lock wait timeout (added in 3.45.0)
-- `sqlite3_snapshot_*` - Snapshot isolation
+- `sqlite3_snapshot_*` - Snapshot isolation (**compile flag enabled**)
 
 ### Lower Priority
 - Virtual tables
