@@ -8,6 +8,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import top.petit.sqlite.callback.ExecCallback;
+import top.petit.sqlite.callback.WalHookCallback;
 import top.petit.sqlite.exception.SqliteExceptionBackup;
 import top.petit.sqlite.exception.SqliteExceptionBind;
 import top.petit.sqlite.exception.SqliteExceptionBlob;
@@ -1281,6 +1282,60 @@ public class Sqlite implements AutoCloseable {
      */
     public int backupPagecount(Backup backup) {
         return sqlite3_backup_pagecount(backup.value());
+    }
+
+    /**
+     * Registers a WAL commit hook on this database connection.
+     *
+     * <p>The hook is invoked after each successful write into the WAL file. Passing
+     * {@code null} removes any previously registered hook.</p>
+     *
+     * <p><b>Example:</b></p>
+     * <pre>{@code
+     * try (var db = Sqlite.open("test.db")) {
+     *     db.exec("PRAGMA journal_mode=WAL");
+     *     db.walHook((dbName, pageCount) -> {
+     *         System.out.println("WAL commit on " + dbName + ", pages: " + pageCount);
+     *         return 0;
+     *     });
+     *     db.exec("CREATE TABLE t (id INTEGER)");
+     * }
+     * }</pre>
+     *
+     * @param callback the hook to invoke after each WAL commit, or {@code null} to remove the hook
+     * @see <a href="https://sqlite.org/c3ref/wal_hook.html">sqlite3_wal_hook documentation</a>
+     */
+    public void walHook(WalHookCallback callback) {
+        if (callback == null) {
+            sqlite3_wal_hook(db, MemorySegment.NULL, MemorySegment.NULL);
+            return;
+        }
+        try {
+            var trampolineHandle = MethodHandles.lookup().findStatic(
+                Sqlite.class,
+                "walHookTrampoline",
+                MethodType.methodType(int.class, WalHookCallback.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, int.class)
+            );
+            trampolineHandle = MethodHandles.insertArguments(trampolineHandle, 0, callback);
+
+            var callbackDescriptor = FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,  // return int
+                ValueLayout.ADDRESS,   // void* userData
+                ValueLayout.ADDRESS,   // sqlite3* db
+                ValueLayout.ADDRESS,   // const char* dbName
+                ValueLayout.JAVA_INT   // int pageCount
+            );
+
+            var callbackStub = Linker.nativeLinker().upcallStub(trampolineHandle, callbackDescriptor, arena);
+            sqlite3_wal_hook(db, callbackStub, MemorySegment.NULL);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to create WAL hook", e);
+        }
+    }
+
+    private static int walHookTrampoline(WalHookCallback callback, MemorySegment userData, MemorySegment db, MemorySegment dbNamePtr, int pageCount) {
+        String dbName = dbNamePtr.equals(MemorySegment.NULL) ? null : dbNamePtr.reinterpret(1024).getString(0);
+        return callback.onWalCommit(dbName, pageCount);
     }
 
     /**

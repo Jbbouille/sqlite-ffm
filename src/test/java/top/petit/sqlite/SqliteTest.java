@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static top.petit.sqlite.util.NativeLibrary.getPlatformSubDir;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -1326,6 +1327,80 @@ class SqliteTest {
         dst.step(stmt);
         assertThat(dst.columnInt(stmt, 0)).isEqualTo(50);
       }
+    }
+  }
+
+  @Test
+  void walHook_isCalledAfterWalWrite() throws Exception {
+    Path dbFile = Files.createTempFile("sqlite-wal-test", ".db");
+    try (var db = Sqlite.open(dbFile.toString())) {
+      db.exec("PRAGMA journal_mode=WAL");
+
+      List<String> calls = new ArrayList<>();
+      db.walHook((dbName, pageCount) -> {
+        calls.add(dbName + ":" + pageCount);
+        return 0;
+      });
+
+      db.exec("CREATE TABLE t (id INTEGER)");
+      db.exec("INSERT INTO t VALUES (1)");
+
+      assertThat(calls).hasSize(2);
+      assertThat(calls.get(0)).startsWith("main:");
+      assertThat(calls.get(1)).startsWith("main:");
+    } finally {
+      Files.deleteIfExists(dbFile);
+      Files.deleteIfExists(dbFile.resolveSibling(dbFile.getFileName() + "-wal"));
+      Files.deleteIfExists(dbFile.resolveSibling(dbFile.getFileName() + "-shm"));
+    }
+  }
+
+  @Test
+  void walHook_pageCountIsPositive() throws Exception {
+    Path dbFile = Files.createTempFile("sqlite-wal-test", ".db");
+    try (var db = Sqlite.open(dbFile.toString())) {
+      db.exec("PRAGMA journal_mode=WAL");
+
+      List<Integer> pageCounts = new ArrayList<>();
+      db.walHook((dbName, pageCount) -> {
+        pageCounts.add(pageCount);
+        return 0;
+      });
+
+      db.exec("CREATE TABLE t (id INTEGER)");
+
+      assertThat(pageCounts).hasSize(1);
+      assertThat(pageCounts.get(0)).isGreaterThan(0);
+    } finally {
+      Files.deleteIfExists(dbFile);
+      Files.deleteIfExists(dbFile.resolveSibling(dbFile.getFileName() + "-wal"));
+      Files.deleteIfExists(dbFile.resolveSibling(dbFile.getFileName() + "-shm"));
+    }
+  }
+
+  @Test
+  void walHook_canBeRemoved() throws Exception {
+    Path dbFile = Files.createTempFile("sqlite-wal-test", ".db");
+    try (var db = Sqlite.open(dbFile.toString())) {
+      db.exec("PRAGMA journal_mode=WAL");
+
+      List<String> calls = new ArrayList<>();
+      db.walHook((dbName, pageCount) -> {
+        calls.add(dbName);
+        return 0;
+      });
+
+      db.exec("CREATE TABLE t (id INTEGER)");
+      assertThat(calls).hasSize(1);
+
+      db.walHook(null);
+      db.exec("INSERT INTO t VALUES (1)");
+
+      assertThat(calls).hasSize(1);
+    } finally {
+      Files.deleteIfExists(dbFile);
+      Files.deleteIfExists(dbFile.resolveSibling(dbFile.getFileName() + "-wal"));
+      Files.deleteIfExists(dbFile.resolveSibling(dbFile.getFileName() + "-shm"));
     }
   }
 }

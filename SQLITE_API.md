@@ -8,7 +8,7 @@ This document lists all SQLite C API functions and their implementation status i
 
 ## Summary
 
-**Implemented: 64 functions**
+**Implemented: 65 functions**
 
 ---
 
@@ -242,7 +242,7 @@ Requires `SQLITE_ENABLE_SNAPSHOT` compile flag (enabled).
 | sqlite3_trace | ❌ | Deprecated |
 | sqlite3_trace_v2 | ❌ | - |
 | sqlite3_profile | ❌ | Deprecated |
-| sqlite3_wal_hook | ❌ | - |
+| sqlite3_wal_hook | ✅ | `walHook(WalHookCallback)` |
 | sqlite3_wal_autocheckpoint | ❌ | - |
 | sqlite3_wal_checkpoint | ❌ | - |
 | sqlite3_wal_checkpoint_v2 | ❌ | - |
