@@ -45,41 +45,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-      - name: 🔧 Configure Maven for GitHub Packages
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml << 'EOF'
-          <settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${env.GITHUB_ACTOR}</username>
-                <password>${env.GITHUB_TOKEN}</password>
-              </server>
-            </servers>
-            <activeProfiles>
-              <activeProfile>github</activeProfile>
-            </activeProfiles>
-            <profiles>
-              <profile>
-                <id>github</id>
-                <repositories>
-                  <repository>
-                    <id>central</id>
-                    <url>https://repo.maven.apache.org/maven2</url>
-                  </repository>
-                  <repository>
-                    <id>github</id>
-                    <url>https://maven.pkg.github.com/Jbbouille/sqlite-ffm</url>
-                    <snapshots>
-                      <enabled>true</enabled>
-                    </snapshots>
-                  </repository>
-                </repositories>
-              </profile>
-            </profiles>
-          </settings>
-          EOF
 
       - name: 🔢 Compute versions
         id: versions
