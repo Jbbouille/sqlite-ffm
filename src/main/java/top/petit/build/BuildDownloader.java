@@ -13,6 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -83,10 +86,6 @@ public class BuildDownloader {
 
     if (!Files.exists(executablePath)) {
       throw new RuntimeException("jextract executable not found after extraction: " + executablePath);
-    }
-
-    if (!osName.contains("win")) {
-      executablePath.toFile().setExecutable(true);
     }
 
     writeJextractProperties(executablePath);
@@ -164,6 +163,7 @@ public class BuildDownloader {
   }
 
   private static void extractTarGz(Path tarGzFile, Path targetDir) throws IOException {
+    boolean posixSupported = targetDir.getFileSystem().supportedFileAttributeViews().contains("posix");
     try (InputStream fis = Files.newInputStream(tarGzFile);
       GZIPInputStream gzis = new GZIPInputStream(fis);
       TarInputStream tis = new TarInputStream(gzis)) {
@@ -189,9 +189,29 @@ public class BuildDownloader {
               remaining -= read;
             }
           }
+          if (posixSupported) {
+            Set<PosixFilePermission> perms = modeToPermissions(entry.getMode());
+            if (!perms.isEmpty()) {
+              Files.setPosixFilePermissions(outputPath, perms);
+            }
+          }
         }
       }
     }
+  }
+
+  private static Set<PosixFilePermission> modeToPermissions(int mode) {
+    Set<PosixFilePermission> perms = EnumSet.noneOf(PosixFilePermission.class);
+    if ((mode & 0400) != 0) perms.add(PosixFilePermission.OWNER_READ);
+    if ((mode & 0200) != 0) perms.add(PosixFilePermission.OWNER_WRITE);
+    if ((mode & 0100) != 0) perms.add(PosixFilePermission.OWNER_EXECUTE);
+    if ((mode & 0040) != 0) perms.add(PosixFilePermission.GROUP_READ);
+    if ((mode & 0020) != 0) perms.add(PosixFilePermission.GROUP_WRITE);
+    if ((mode & 0010) != 0) perms.add(PosixFilePermission.GROUP_EXECUTE);
+    if ((mode & 0004) != 0) perms.add(PosixFilePermission.OTHERS_READ);
+    if ((mode & 0002) != 0) perms.add(PosixFilePermission.OTHERS_WRITE);
+    if ((mode & 0001) != 0) perms.add(PosixFilePermission.OTHERS_EXECUTE);
+    return perms;
   }
 
   static class TarInputStream extends FilterInputStream {
@@ -233,12 +253,13 @@ public class BuildDownloader {
       }
 
       String name = extractString(buffer, 0, 100);
+      int mode = (int) extractOctal(buffer, 100, 8);
       long size = extractOctal(buffer, 124, 12);
       byte typeFlag = buffer[156];
 
       bytesRemainingInCurrentEntry = ((size + 511) / 512) * 512;
 
-      return new TarEntry(name, size, typeFlag == '5');
+      return new TarEntry(name, size, typeFlag == '5', mode);
     }
 
     private String extractString(byte[] buffer, int offset, int length) {
@@ -276,11 +297,13 @@ public class BuildDownloader {
     private final String name;
     private final long size;
     private final boolean directory;
+    private final int mode;
 
-    public TarEntry(String name, long size, boolean directory) {
+    public TarEntry(String name, long size, boolean directory, int mode) {
       this.name = name;
       this.size = size;
       this.directory = directory;
+      this.mode = mode;
     }
 
     public String getName() {
@@ -293,6 +316,10 @@ public class BuildDownloader {
 
     public boolean isDirectory() {
       return directory;
+    }
+
+    public int getMode() {
+      return mode;
     }
   }
 }
