@@ -119,6 +119,7 @@ public class SqliteNativeCompiler {
       "zig", "cc",
       "-shared", "-fPIC",
       optFlag,
+      "-DSQLITE_ENABLE_SNAPSHOT",
       "-target", zigTarget,
       "-o", targetLib.toAbsolutePath().toString(),
       sqliteSource.toAbsolutePath().toString()
