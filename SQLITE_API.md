@@ -8,7 +8,7 @@ This document lists all SQLite C API functions and their implementation status i
 
 ## Summary
 
-**Implemented: 65 functions**
+**Implemented: 66 functions**
 
 ---
 
@@ -41,7 +41,7 @@ This document lists all SQLite C API functions and their implementation status i
 | Function | Status | Java Method |
 |----------|--------|-------------|
 | sqlite3_bind_blob | ✅ | `bindBlob(PrepareStatement, int, byte[])` |
-| sqlite3_bind_blob64 | ❌ | - |
+| sqlite3_bind_blob64 | ✅ | `bindBlob64(PrepareStatement, int, byte[])` |
 | sqlite3_bind_double | ✅ | `bindDouble(PrepareStatement, int, double)` |
 | sqlite3_bind_int | ✅ | `bindInt(PrepareStatement, int, int)` |
 | sqlite3_bind_int64 | ✅ | `bindLong(PrepareStatement, int, long)` |

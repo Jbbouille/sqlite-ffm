@@ -532,6 +532,28 @@ public class Sqlite implements AutoCloseable {
     }
 
     /**
+     * Binds a blob value to a prepared statement parameter, using a 64-bit size.
+     *
+     * <p>Identical to {@link #bindBlob(PrepareStatement, int, byte[])} but accepts a {@code long}
+     * size, allowing blobs larger than 2 GiB.</p>
+     *
+     * @param stmt the prepared statement
+     * @param index the parameter index (1-based)
+     * @param value the byte array to bind
+     * @throws SqliteExceptionBind if the bind operation fails
+     * @see <a href="https://sqlite.org/c3ref/bind_blob.html">sqlite3_bind documentation</a>
+     */
+    public void bindBlob64(PrepareStatement stmt, int index, byte[] value) throws SqliteExceptionBind {
+        var blobSegment = arena.allocate(value.length);
+        blobSegment.copyFrom(MemorySegment.ofArray(value));
+        var rc = sqlite3_bind_blob64(stmt.value(), index, blobSegment, value.length, MemorySegment.NULL);
+        var result = Bind.fromCode(rc);
+        if (!result.isOk()) {
+            throw new SqliteExceptionBind("Failed to bind blob64 at index %d with error %s.".formatted(index, result), result);
+        }
+    }
+
+    /**
      * Binds a NULL value to a prepared statement parameter.
      *
      * @param stmt the prepared statement
