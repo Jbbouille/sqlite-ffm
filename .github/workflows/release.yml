@@ -92,7 +92,7 @@ jobs:
           git commit -m "release ${{ steps.versions.outputs.release }}"
 
       - name: 📦 Build and deploy to GitHub Packages
-        run: mvn -B deploy -Prelease -Dgithub.repository=${{ github.repository }}
+        run: mvn -B deploy -Prelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
