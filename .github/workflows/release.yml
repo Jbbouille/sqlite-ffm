@@ -77,6 +77,12 @@ jobs:
           echo "next=$NEXT" >> $GITHUB_OUTPUT
           echo "Releasing $RELEASE, next snapshot will be $NEXT"
 
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
       - name: Set release version
         run: mvn -B versions:set -DnewVersion=${{ steps.versions.outputs.release }} -DgenerateBackupPoms=false
 
@@ -103,3 +109,16 @@ jobs:
 
       - name: Push commits and tag
         run: git push origin master --tags
+
+      - name: Create GitHub Release
+        run: |
+          TAG="v${{ steps.versions.outputs.release }}"
+          PREV_TAG="${{ steps.prev_tag.outputs.prev_tag }}"
+          if [ -z "$PREV_TAG" ]; then
+            NOTES=$(git log --pretty=format:"- %s" "$TAG" | grep -v "^- release " | grep -v "^- prepare next development")
+          else
+            NOTES=$(git log --pretty=format:"- %s" "${PREV_TAG}..${TAG}" | grep -v "^- release " | grep -v "^- prepare next development")
+          fi
+          gh release create "$TAG" --title "$TAG" --notes "$NOTES"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
