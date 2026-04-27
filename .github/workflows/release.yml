@@ -34,11 +34,20 @@ jobs:
           distribution: 'temurin'
 
       - name: ⚡ Install Zig
+        id: cache-zig
+        uses: actions/cache@v4
+        with:
+          path: zig-x86_64-linux-0.16.0
+          key: zig-0.16.0
+
+      - name: ⚡ Download Zig
+        if: steps.cache-zig.outputs.cache-hit != 'true'
         run: |
-          ZIG_VERSION="0.16.0"
-          wget -q "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
-          tar -xf "zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
-          echo "$PWD/zig-linux-x86_64-${ZIG_VERSION}" >> $GITHUB_PATH
+          wget -q "https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz"
+          tar -xf "zig-x86_64-linux-0.16.0.tar.xz"
+
+      - name: ⚡ Add Zig to PATH
+        run: echo "$PWD/zig-x86_64-linux-0.16.0" >> $GITHUB_PATH
 
       - name: 🔧 Configure Git
         run: |
