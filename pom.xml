@@ -34,14 +34,6 @@
     </dependency>
   </dependencies>
 
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>GitHub jbbouille Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/jbbouille/sqlite-ffm</url>
-    </repository>
-  </distributionManagement>
-
   <build>
     <plugins>
       <!-- Compile build tools first (only the build package) -->
