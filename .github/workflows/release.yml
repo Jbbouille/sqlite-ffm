@@ -96,9 +96,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🏷️ Tag release
-        run: git tag v${{ steps.versions.outputs.release }}
-
       - name: 📝 Set next snapshot version
         run: mvn -B versions:set -DnewVersion=${{ steps.versions.outputs.next }} -DgenerateBackupPoms=false
 
@@ -106,6 +103,12 @@ jobs:
         run: |
           git add pom.xml
           git commit -m "prepare next development iteration ${{ steps.versions.outputs.next }}"
+
+      - name: 🔄 Rebase on remote before push
+        run: git rebase origin/master
+
+      - name: 🏷️ Tag release
+        run: git tag v${{ steps.versions.outputs.release }} HEAD~1
 
       - name: 📤 Push commits and tag
         run: git push origin master --tags
