@@ -78,7 +78,7 @@ jobs:
           git commit -m "release ${{ steps.versions.outputs.release }}"
 
       - name: 📦 Build and deploy to GitHub Packages
-        run: mvn -B deploy -Prelease
+        run: mvn -B deploy -Prelease -DaltDeploymentRepository=github::https://maven.pkg.github.com/Jbbouille/sqlite-ffm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
