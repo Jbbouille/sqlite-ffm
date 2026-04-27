@@ -37,7 +37,8 @@
   <distributionManagement>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/${github.repository}</url>
+      <name>GitHub jbbouille Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/jbbouille/sqlite-ffm</url>
     </repository>
   </distributionManagement>
 
