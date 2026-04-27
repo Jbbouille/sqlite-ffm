@@ -35,7 +35,7 @@ jobs:
 
       - name: ⚡ Install Zig
         run: |
-          ZIG_VERSION="0.14.0"
+          ZIG_VERSION="0.16.0"
           wget -q "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
           tar -xf "zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
           echo "$PWD/zig-linux-x86_64-${ZIG_VERSION}" >> $GITHUB_PATH
