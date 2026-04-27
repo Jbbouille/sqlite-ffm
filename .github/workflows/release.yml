@@ -57,6 +57,27 @@ jobs:
                 <password>${env.GITHUB_TOKEN}</password>
               </server>
             </servers>
+            <activeProfiles>
+              <activeProfile>github</activeProfile>
+            </activeProfiles>
+            <profiles>
+              <profile>
+                <id>github</id>
+                <repositories>
+                  <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                  </repository>
+                  <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/Jbbouille/sqlite-ffm</url>
+                    <snapshots>
+                      <enabled>true</enabled>
+                    </snapshots>
+                  </repository>
+                </repositories>
+              </profile>
+            </profiles>
           </settings>
           EOF
 
@@ -92,7 +113,7 @@ jobs:
           git commit -m "release ${{ steps.versions.outputs.release }}"
 
       - name: 📦 Build and deploy to GitHub Packages
-        run: mvn -B deploy -Prelease -DaltDeploymentRepository=github::https://maven.pkg.github.com/Jbbouille/sqlite-ffm
+        run: mvn -B deploy -Prelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
